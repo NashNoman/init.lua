@@ -7,7 +7,6 @@ return {
     { "folke/neodev.nvim", opts = {} },
   },
   config = function()
-
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
@@ -17,7 +16,6 @@ return {
     -- import cmp-nvim-lsp plugin
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-
     local keymap = vim.keymap -- for conciseness
 
     vim.api.nvim_create_autocmd("LspAttach", {
@@ -26,7 +24,6 @@ return {
         -- Buffer local mappings.
         -- See `:help vim.lsp.*` for documentation on any of the below functions
         local opts = { buffer = ev.buf, silent = true }
-
 
         -- set keybinds
         opts.desc = "Show LSP references"
@@ -48,10 +45,8 @@ return {
         opts.desc = "See available code actions"
         keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
-
         opts.desc = "Smart rename"
         keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
-
 
         opts.desc = "Show buffer diagnostics"
         keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
@@ -93,36 +88,11 @@ return {
           capabilities = capabilities,
         })
       end,
-      ["svelte"] = function()
-        -- configure svelte server
-
-        lspconfig["svelte"].setup({
-          capabilities = capabilities,
-          on_attach = function(client, bufnr)
-            vim.api.nvim_create_autocmd("BufWritePost", {
-              pattern = { "*.js", "*.ts" },
-              callback = function(ctx)
-                -- Here use ctx.match instead of ctx.file
-                client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-              end,
-            })
-          end,
-        })
-      end,
-      ["graphql"] = function()
-
-        -- configure graphql language server
-        lspconfig["graphql"].setup({
-          capabilities = capabilities,
-          filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-        })
-      end,
       ["emmet_ls"] = function()
-
         -- configure emmet language server
         lspconfig["emmet_ls"].setup({
           capabilities = capabilities,
-          filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
+          filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte", "vue" },
         })
       end,
       ["lua_ls"] = function()
@@ -145,7 +115,23 @@ return {
           },
         })
       end,
+      ["tsserver"] = function()
+        lspconfig["tsserver"].setup({
+          capabilities = capabilities,
+          init_options = {
+            plugins = {
+              {
+                name = "@vue/typescript-plugin",
+                location = vim.env.HOME .. "/.nvm/versions/node/v22.3.0/lib/node_modules/@vue/typescript-plugin/lib",
+                --location = require("mason-registry").get_package("vue-language-server"):get_install_path()
+                --.. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
+                languages = { "vue" },
+              },
+            },
+          },
+          filetypes = { "vue", "typescript", "javascript", "javascriptreact", "typescriptreact" },
+        })
+      end,
     })
   end,
 }
-

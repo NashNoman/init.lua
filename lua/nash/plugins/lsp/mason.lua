@@ -13,7 +13,6 @@ return {
 
     local mason_tool_installer = require("mason-tool-installer")
 
-
     -- enable mason and configure icons
     mason.setup({
       ui = {
@@ -25,7 +24,6 @@ return {
       },
     })
 
-
     mason_lspconfig.setup({
       -- list of servers for mason to install
       ensure_installed = {
@@ -33,15 +31,13 @@ return {
         "html",
         "cssls",
         "tailwindcss",
-        "svelte",
         "lua_ls",
-        "graphql",
         "emmet_ls",
         "prismals",
         "pyright",
-	"volar",
-	"dockerls",
-	"docker_compose_language_service"
+        -- "volar",
+        "dockerls",
+        "docker_compose_language_service",
       },
     })
 

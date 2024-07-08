@@ -1,2 +1,2 @@
-require('nash.core')
-require('nash.lazy')
+require("nash.core")
+require("nash.lazy")
