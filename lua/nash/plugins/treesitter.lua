@@ -48,7 +48,6 @@ return {
         "query",
         "vimdoc",
         "java",
-        "c",
         "vue",
       },
       incremental_selection = {

@@ -7,7 +7,8 @@ map("n", "<leader><leader>", function()
   vim.cmd("so")
 end)
 
-map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
+map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+map({ "i", "x", "n", "s" }, "<C-S-s>", "<cmd>wa<cr><esc>", { desc = "Save all files" })
 map("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 map("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })

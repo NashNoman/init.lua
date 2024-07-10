@@ -35,7 +35,7 @@ return {
         "emmet_ls",
         "prismals",
         "pyright",
-        -- "volar",
+        "volar",
         "dockerls",
         "docker_compose_language_service",
       },

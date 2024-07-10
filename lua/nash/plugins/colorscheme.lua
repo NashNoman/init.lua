@@ -3,17 +3,20 @@ return {
     "projekt0n/github-nvim-theme",
     priority = 1000,
     config = function()
+      require("github-theme").setup({
+        terminal_colors = true,
+        options = {
+          transparent = true,
+        },
+      })
       vim.cmd.colorscheme("github_dark_tritanopia")
-
-      vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
     end,
   },
   {
     "folke/tokyonight.nvim",
-    -- priority = 1000,
+    priority = 1000,
     config = function()
-      local transparent = false -- set to true if you would like to enable transparency
+      local transparent = true -- set to true if you would like to enable transparency
       local bg = "#011628"
       local bg_dark = "#011423"
       local bg_highlight = "#143652"

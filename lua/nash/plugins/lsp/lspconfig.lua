@@ -5,8 +5,15 @@ return {
     "hrsh7th/cmp-nvim-lsp",
     { "antosha417/nvim-lsp-file-operations", config = true },
     { "folke/neodev.nvim", opts = {} },
+    { "folke/neoconf.nvim" },
+  },
+  opts = {
+    diagnostics = {
+      update_in_insert = true,
+    },
   },
   config = function()
+    require("neoconf").setup({})
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
@@ -84,6 +91,9 @@ return {
     mason_lspconfig.setup_handlers({
       -- default handler for installed servers
       function(server_name)
+        if require("neoconf").get(server_name .. ".disable") then
+          return
+        end
         lspconfig[server_name].setup({
           capabilities = capabilities,
         })
@@ -115,11 +125,26 @@ return {
           },
         })
       end,
+      ["volar"] = function()
+        lspconfig["volar"].setup({
+          filetypes = { "vue", "javascript", "typescript" },
+          capabilities = capabilities,
+          init_options = {
+            typescript = {
+              tsdk = "/home/nash/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib",
+              -- tsdk = require('mason').,
+            },
+            vue = {
+              hybridMode = false,
+            },
+          },
+        })
+      end,
       ["tsserver"] = function()
         lspconfig["tsserver"].setup({
           capabilities = capabilities,
           init_options = {
-            plugins = {
+            --[[ plugins = {
               {
                 name = "@vue/typescript-plugin",
                 location = vim.env.HOME .. "/.nvm/versions/node/v22.3.0/lib/node_modules/@vue/typescript-plugin/lib",
@@ -127,9 +152,9 @@ return {
                 --.. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
                 languages = { "vue" },
               },
-            },
+            }, ]]
           },
-          filetypes = { "vue", "typescript", "javascript", "javascriptreact", "typescriptreact" },
+          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
         })
       end,
     })

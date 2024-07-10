@@ -22,6 +22,17 @@ return {
 
     local lspkind = require("lspkind")
 
+    local types = require("cmp.types")
+
+    local function deprioritize_snippet(entry1, entry2)
+      if entry1:get_kind() == types.lsp.CompletionItemKind.Snippet then
+        return false
+      end
+      if entry2:get_kind() == types.lsp.CompletionItemKind.Snippet then
+        return true
+      end
+    end
+
     -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
     require("luasnip.loaders.from_vscode").lazy_load()
 
@@ -34,9 +45,26 @@ return {
           luasnip.lsp_expand(args.body)
         end,
       },
+      sorting = {
+        priority_weight = 2,
+        comparators = {
+          deprioritize_snippet,
+          -- the rest of the comparators are pretty much the defaults
+          cmp.config.compare.offset,
+          cmp.config.compare.exact,
+          cmp.config.compare.scopes,
+          cmp.config.compare.score,
+          cmp.config.compare.recently_used,
+          cmp.config.compare.locality,
+          cmp.config.compare.kind,
+          cmp.config.compare.sort_text,
+          cmp.config.compare.length,
+          cmp.config.compare.order,
+        },
+      },
       mapping = cmp.mapping.preset.insert({
-        ["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-        ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
+        ["<A-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+        ["<A-j>"] = cmp.mapping.select_next_item(), -- next suggestion
         ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
         ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
@@ -45,8 +73,8 @@ return {
       }),
       -- sources for autocompletion
       sources = cmp.config.sources({
-        { name = "luasnip" }, -- snippets
         { name = "nvim_lsp" },
+        { name = "luasnip" }, -- snippets
         { name = "buffer" }, -- text within current buffer
         { name = "path" }, -- file system paths
       }),
