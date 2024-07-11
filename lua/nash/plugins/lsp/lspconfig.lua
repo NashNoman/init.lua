@@ -98,9 +98,9 @@ return {
           capabilities = capabilities,
         })
       end,
-      ["emmet_ls"] = function()
+      ["emmet_language_server"] = function()
         -- configure emmet language server
-        lspconfig["emmet_ls"].setup({
+        lspconfig["emmet_language_server"].setup({
           capabilities = capabilities,
           filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte", "vue" },
         })
@@ -127,7 +127,7 @@ return {
       end,
       ["volar"] = function()
         lspconfig["volar"].setup({
-          filetypes = { "vue", "javascript", "typescript" },
+          -- filetypes = { "vue", "javascript", "typescript" },
           capabilities = capabilities,
           init_options = {
             typescript = {
@@ -144,17 +144,16 @@ return {
         lspconfig["tsserver"].setup({
           capabilities = capabilities,
           init_options = {
-            --[[ plugins = {
+            plugins = {
               {
                 name = "@vue/typescript-plugin",
-                location = vim.env.HOME .. "/.nvm/versions/node/v22.3.0/lib/node_modules/@vue/typescript-plugin/lib",
-                --location = require("mason-registry").get_package("vue-language-server"):get_install_path()
-                --.. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
+                -- location = vim.env.HOME .. "/.nvm/versions/node/v22.3.0/lib/node_modules/@vue/typescript-plugin/lib",
+                location = require("mason-registry").get_package("vue-language-server"):get_install_path()
+                  .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
                 languages = { "vue" },
               },
-            }, ]]
+            },
           },
-          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
         })
       end,
     })

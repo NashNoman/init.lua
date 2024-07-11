@@ -45,7 +45,7 @@ return {
           luasnip.lsp_expand(args.body)
         end,
       },
-      sorting = {
+      --[[ sorting = {
         priority_weight = 2,
         comparators = {
           deprioritize_snippet,
@@ -61,7 +61,7 @@ return {
           cmp.config.compare.length,
           cmp.config.compare.order,
         },
-      },
+      }, ]]
       mapping = cmp.mapping.preset.insert({
         ["<A-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
         ["<A-j>"] = cmp.mapping.select_next_item(), -- next suggestion
@@ -70,6 +70,7 @@ return {
         ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
         ["<C-e>"] = cmp.mapping.abort(), -- close completion window
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping.confirm({ select = true }),
       }),
       -- sources for autocompletion
       sources = cmp.config.sources({
