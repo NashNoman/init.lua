@@ -32,6 +32,7 @@ return {
         "cssls",
         "tailwindcss",
         "lua_ls",
+        "jdtls",
         "emmet_language_server",
         "prismals",
         "pyright",

@@ -34,6 +34,7 @@ return {
         "javascript",
         "typescript",
         "tsx",
+        "java",
         "yaml",
         "html",
         "css",

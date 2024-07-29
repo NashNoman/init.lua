@@ -14,6 +14,13 @@ return {
   },
   config = function()
     require("neoconf").setup({})
+
+    -- vim lsp api
+    local lsp = vim.lsp
+    lsp.handlers["textDocument/hover"] = lsp.with(vim.lsp.handlers.hover, {
+      border = "rounded",
+    })
+
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
@@ -77,7 +84,15 @@ return {
     })
 
     -- used to enable autocompletion (assign to every lsp server config)
-    local capabilities = cmp_nvim_lsp.default_capabilities()
+    local capabilities = vim.tbl_deep_extend(
+      -- "error": raise an error
+      -- "keep": use value from the leftmost map
+      -- "force": use value from the rightmost map
+      "force",
+      {}, -- Empty capabilities
+      vim.lsp.protocol.make_client_capabilities(), -- Minimal capabilities
+      require("cmp_nvim_lsp").default_capabilities() -- Default capabilities
+    )
 
     -- Change the Diagnostic symbols in the sign column (gutter)
 
@@ -113,11 +128,9 @@ return {
           settings = {
             Lua = {
               -- make the language server recognize "vim" global
-
               diagnostics = {
                 globals = { "vim" },
               },
-
               completion = {
                 callSnippet = "Replace",
               },
@@ -130,12 +143,13 @@ return {
           -- filetypes = { "vue", "javascript", "typescript" },
           capabilities = capabilities,
           init_options = {
-            typescript = {
-              tsdk = "/home/nash/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib",
-              -- tsdk = require('mason').,
-            },
+            -- typescript = {
+            -- tsdk = "~/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib",
+            -- tsdk = require('mason').,
+            -- tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+            -- },
             vue = {
-              hybridMode = false,
+              -- hybridMode = false,
             },
           },
         })
@@ -149,11 +163,12 @@ return {
                 name = "@vue/typescript-plugin",
                 -- location = vim.env.HOME .. "/.nvm/versions/node/v22.3.0/lib/node_modules/@vue/typescript-plugin/lib",
                 location = require("mason-registry").get_package("vue-language-server"):get_install_path()
-                  .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
+                  .. "/node_modules/@vue/language-server",
                 languages = { "vue" },
               },
             },
           },
+          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
         })
       end,
     })
