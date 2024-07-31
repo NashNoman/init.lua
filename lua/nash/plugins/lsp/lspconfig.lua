@@ -15,6 +15,17 @@ return {
   config = function()
     require("neoconf").setup({})
 
+    -- used to enable autocompletion (assign to every lsp server config)
+    local capabilities = vim.tbl_deep_extend(
+      -- "error": raise an error
+      -- "keep": use value from the leftmost map
+      -- "force": use value from the rightmost map
+      "force",
+      {}, -- Empty capabilities
+      vim.lsp.protocol.make_client_capabilities(), -- Minimal capabilities
+      require("cmp_nvim_lsp").default_capabilities() -- Default capabilities
+    )
+
     -- vim lsp api
     local lsp = vim.lsp
     lsp.handlers["textDocument/hover"] = lsp.with(vim.lsp.handlers.hover, {
@@ -24,11 +35,31 @@ return {
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
+    -- local configs = require("lspconfig.configs")
+    --
+    -- configs.blade = {
+    --   default_config = {
+    --     -- Path to the executable: laravel-dev-generators
+    --     cmd = { "laravel-dev-generators", "lsp" },
+    --
+    --     filetypes = { "blade" },
+    --     root_dir = function(fname)
+    --       return lspconfig.util.find_git_ancestor(fname)
+    --     end,
+    --     settings = {},
+    --   },
+    -- }
+    --
+    -- lspconfig.blade.setup({
+    --   -- Capabilities is specific to my setup.
+    --   capabilities = capabilities,
+    -- })
+
     -- import mason_lspconfig plugin
     local mason_lspconfig = require("mason-lspconfig")
 
     -- import cmp-nvim-lsp plugin
-    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+    -- local cmp_nvim_lsp = require("cmp-nvim-lsp")
 
     local keymap = vim.keymap -- for conciseness
 
@@ -82,17 +113,6 @@ return {
         keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
       end,
     })
-
-    -- used to enable autocompletion (assign to every lsp server config)
-    local capabilities = vim.tbl_deep_extend(
-      -- "error": raise an error
-      -- "keep": use value from the leftmost map
-      -- "force": use value from the rightmost map
-      "force",
-      {}, -- Empty capabilities
-      vim.lsp.protocol.make_client_capabilities(), -- Minimal capabilities
-      require("cmp_nvim_lsp").default_capabilities() -- Default capabilities
-    )
 
     -- Change the Diagnostic symbols in the sign column (gutter)
 
@@ -169,6 +189,22 @@ return {
             },
           },
           filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+        })
+      end,
+      ["intelephense"] = function()
+        lspconfig["intelephense"].setup({
+          capabilities = capabilities,
+          settings = {
+            intelephense = {
+              filetypes = { "php", "blade" },
+              files = {
+                associations = { "*.php", "*.blade.php" }, -- Associating .blade.php files as well
+                maxSize = 5000000,
+              },
+            },
+          },
+          root_pattern = { "composer.json", ".git" },
+          filetypes = { "php", "blade" },
         })
       end,
     })

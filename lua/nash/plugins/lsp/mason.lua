@@ -39,17 +39,22 @@ return {
         "volar",
         "dockerls",
         "docker_compose_language_service",
+        "intelephense",
       },
     })
 
     mason_tool_installer.setup({
       ensure_installed = {
-        "prettier", -- prettier formatter
+        "prettierd", -- prettier formatter
         "stylua", -- lua formatter
         "isort", -- python formatter
         "black", -- python formatter
         "pylint",
+        "pint",
+        "blade-formatter",
+        "rustywind",
         "eslint_d",
+        "php-debug-adapter",
       },
     })
   end,
