@@ -3,7 +3,7 @@ return {
   event = "InsertEnter",
   dependencies = {
     "hrsh7th/cmp-buffer", -- source for text in buffer
-    "hrsh7th/cmp-path", -- source for file system paths
+    "hrsh7th/cmp-path",   -- source for file system paths
     {
       "L3MON4D3/LuaSnip",
       -- follow latest release.
@@ -11,9 +11,9 @@ return {
       -- install jsregexp (optional!).
       build = "make install_jsregexp",
     },
-    "saadparwaiz1/cmp_luasnip", -- for autocompletion
+    "saadparwaiz1/cmp_luasnip",     -- for autocompletion
     "rafamadriz/friendly-snippets", -- useful snippets
-    "onsails/lspkind.nvim", -- vs-code like pictograms
+    "onsails/lspkind.nvim",         -- vs-code like pictograms
     "lukas-reineke/cmp-under-comparator",
   },
   config = function()
@@ -35,15 +35,15 @@ return {
 
     cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done({ map_char = { tex = "" } }))
 
-    local function is_in_start_tag()
-      local ts_utils = require("nvim-treesitter.ts_utils")
-      local node = ts_utils.get_node_at_cursor()
-      if not node then
-        return false
-      end
-      local node_to_check = { "start_tag", "self_closing_tag", "directive_attribute" }
-      return vim.tbl_contains(node_to_check, node:type())
-    end
+    -- local function is_in_start_tag()
+    --   local ts_utils = require("nvim-treesitter.ts_utils")
+    --   local node = ts_utils.get_node_at_cursor()
+    --   if not node then
+    --     return false
+    --   end
+    --   local node_to_check = { "start_tag", "self_closing_tag", "directive_attribute" }
+    --   return vim.tbl_contains(node_to_check, node:type())
+    -- end
 
     ---@type table<integer, integer>
     local modified_priority = {
@@ -76,6 +76,17 @@ return {
       },
     }
 
+    local function deprio(kind)
+      return function(e1, e2)
+        if e1:get_kind() == kind then
+          return false
+        end
+        if e2:get_kind() == kind then
+          return true
+        end
+      end
+    end
+
     cmp.setup({
       completion = {
         completeopt = "menu,menuone,preview,noselect",
@@ -90,49 +101,50 @@ return {
         ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
         ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
-        ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-        ["<C-e>"] = cmp.mapping.abort(), -- close completion window
+        ["<C-Space>"] = cmp.mapping.complete({}), -- show completion suggestions
+        ["<C-e>"] = cmp.mapping.abort(),          -- close completion window
         ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping.confirm({ select = true }),
       }),
       -- sources for autocompletion
       sources = cmp.config.sources({
         {
           name = "nvim_lsp",
 
-          ---@param entry cmp.Entry
-          ---@param ctx cmp.Context
-          entry_filter = function(entry, ctx)
-            -- Use a buffer-local variable to cache the result of the Treesitter check
-            local bufnr = ctx.bufnr
-            local cached_is_in_start_tag = vim.b[bufnr]._vue_ts_cached_is_in_start_tag
-            if cached_is_in_start_tag == nil then
-              vim.b[bufnr]._vue_ts_cached_is_in_start_tag = is_in_start_tag()
-            end
-            -- If not in start tag, return true
-            if vim.b[bufnr]._vue_ts_cached_is_in_start_tag == false then
-              return true
-            end
-
-            -- Check if the buffer type is 'vue'
-            if ctx.filetype ~= "vue" then
-              return true
-            end
-
-            local cursor_before_line = ctx.cursor_before_line
-            -- For events
-            if cursor_before_line:sub(-1) == "@" then
-              return entry.completion_item.label:match("^@")
-            -- For props also exclude events with `:on-` prefix
-            elseif cursor_before_line:sub(-1) == ":" then
-              return entry.completion_item.label:match("^:") and not entry.completion_item.label:match("^:on%-")
-            else
-              return true
-            end
-          end,
+          -- ---@param entry cmp.Entry
+          -- ---@param ctx cmp.Context
+          -- entry_filter = function(entry, ctx)
+          --   -- Use a buffer-local variable to cache the result of the Treesitter check
+          --   local bufnr = ctx.bufnr
+          --   local cached_is_in_start_tag = vim.b[bufnr]._vue_ts_cached_is_in_start_tag
+          --   if cached_is_in_start_tag == nil then
+          --     vim.b[bufnr]._vue_ts_cached_is_in_start_tag = is_in_start_tag()
+          --   end
+          --   -- If not in start tag, return true
+          --   if vim.b[bufnr]._vue_ts_cached_is_in_start_tag == false then
+          --     return true
+          --   end
+          --
+          --   -- Check if the buffer type is 'vue'
+          --   if ctx.filetype ~= "vue" then
+          --     return true
+          --   end
+          --
+          --   local cursor_before_line = ctx.cursor_before_line
+          --   -- For events
+          --   if cursor_before_line:sub(-1) == "@" then
+          --     return entry.completion_item.label:match("^@")
+          --   -- For props also exclude events with `:on-` prefix
+          --   elseif cursor_before_line:sub(-1) == ":" then
+          --     return entry.completion_item.label:match("^:") and not entry.completion_item.label:match("^:on%-")
+          --   else
+          --     return true
+          --   end
+          -- end,
         },
         { name = "luasnip" }, -- snippets
         -- { name = "buffer" }, -- text within current buffer
-        { name = "path" }, -- file system paths
+        { name = "path" },    -- file system paths
       }, {
         buffers,
         { name = "dictionary", keyword_length = 3 },
@@ -145,20 +157,23 @@ return {
         priority_weight = 2,
         comparators = {
           -- vue_filter_comparator, -- Add the custom comparator here
+          deprio(types.lsp.CompletionItemKind.Snippet),
+          deprio(types.lsp.CompletionItemKind.Text),
+          deprio(types.lsp.CompletionItemKind.Keyword),
           cmp_under_comparator,
           compare.offset,
           compare.exact,
-          -- compare.recently_used,
-          -- compare.locality,
-          function(entry1, entry2) -- sort by compare kind (Variable, Function etc)
-            local kind1 = modified_kind(entry1:get_kind())
-            local kind2 = modified_kind(entry2:get_kind())
-            if kind1 ~= kind2 then
-              return kind1 - kind2 < 0
-            end
-          end,
-          -- compare.sort_text,
-          -- compare.length,
+          compare.recently_used,
+          compare.locality,
+          -- function(entry1, entry2) -- sort by compare kind (Variable, Function etc)
+          --   local kind1 = modified_kind(entry1:get_kind())
+          --   local kind2 = modified_kind(entry2:get_kind())
+          --   if kind1 ~= kind2 then
+          --     return kind1 - kind2 < 0
+          --   end
+          -- end,
+          compare.sort_text,
+          compare.length,
           compare.score,
           compare.order,
         },
@@ -169,6 +184,7 @@ return {
         format = lspkind.cmp_format({
           maxwidth = 50,
           ellipsis_char = "...",
+          symbol_map = { Codeium = "", }
         }),
       },
     })

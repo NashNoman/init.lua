@@ -6,6 +6,7 @@ return {
     { "antosha417/nvim-lsp-file-operations", config = true },
     { "folke/neodev.nvim", opts = {} },
     { "folke/neoconf.nvim" },
+    "williamboman/mason.nvim",
   },
   opts = {
     diagnostics = {
@@ -174,8 +175,8 @@ return {
           },
         })
       end,
-      ["tsserver"] = function()
-        lspconfig["tsserver"].setup({
+      ["ts_ls"] = function()
+        lspconfig["ts_ls"].setup({
           capabilities = capabilities,
           init_options = {
             plugins = {
